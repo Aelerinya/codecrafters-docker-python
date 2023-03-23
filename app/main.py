@@ -15,7 +15,8 @@ def main():
 
     path = root_folder + command if root_folder is not None else command
 
-    _completed_process = subprocess.run([path, *args])
+    completed_process = subprocess.run([path, *args])
+    exit(completed_process.returncode)
 
 
 if __name__ == "__main__":
