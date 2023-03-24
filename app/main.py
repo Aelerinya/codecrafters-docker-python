@@ -5,8 +5,7 @@ from shutil import copy
 import sys
 from tempfile import TemporaryDirectory
 
-
-root_folder = Path(os.environ.get("MY_DOCKER_ROOT") or "/").resolve()
+from app.unshare import unshare_pid
 
 
 def start_in_chroot(chroot_directory: Path, command: str, args: list[str]):
@@ -20,10 +19,10 @@ def main():
 
     with TemporaryDirectory() as dir:
         dir = Path(dir)
-        old_command_path = (root_folder / ("./" + command)).resolve()
         new_command_path = (dir / ("./" + command)).resolve()
         new_command_path.parent.mkdir(parents=True)
-        copy(old_command_path, new_command_path)
+        copy(command, new_command_path)
+        unshare_pid()
         subprocess = Process(target=start_in_chroot, args=[dir, command, args])
         subprocess.start()
         subprocess.join()
